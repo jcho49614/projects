@@ -2,8 +2,10 @@ import tensorflow as tf
 import os
 import cv2
 import imghdr
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropout
+from tensorflow.keras.models import Sequential # type: ignore
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropout # type: ignore
+import numpy as np
+
 
 testing = 'data'
 valid_exts = ['jpg', 'jpeg', 'png']
@@ -59,11 +61,39 @@ model.add(Conv2D(16, (3,3), 1, activation = 'relu'))
 model.add(MaxPooling2D()) #condenses by half
 
 model.add(Flatten()) #flattens to single model
-model.add(Dense(256, activation='relu'))
+model.add(Dense(512, activation='relu'))
 model.add(Dense(1, activation='sigmoid'))
 
 model.compile('adam', loss=tf.losses.BinaryCrossentropy(), metrics=['accuracy'])
 
-model.summary()
+model.summary() #shows accurate summary of model.
+
+#training the model.
 
 
+logdir = 'logs' #saves everything in "logs"
+tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=logdir) #creates callbacks
+hist = model.fit(train, epochs=1000, validation_data=val, callbacks=[tensorboard_callback])
+#trains the model: uses train dataset, 20 times, uses validation data to validate, and callbacks on tensorboard_callback
+
+
+from tensorflow.keras.metrics import Precision, Recall, BinaryAccuracy
+
+pre = Precision()
+re = Recall()
+acc = BinaryAccuracy()
+
+for batch in test.as_numpy_iterator(): #model.predict requires batch[0].
+    #y is used for identification.
+    x, y = batch
+    yhat = model.predict(x)
+    pre.update_state(y, yhat)
+    re.update_state(y, yhat)
+    acc.update_state(y,yhat)
+
+print(pre.result(), re.result(), acc.result())
+
+#gpt, img is the image I want to have it input. help me!
+
+from tensorflow.keras.models import load_model
+model.save(os.path.join('finalmodel', 'catdogmodel.h5'))
