@@ -36,6 +36,6 @@ yhat = model.predict(input_tensor)[0][0]
 
 print(f"\nPrediction confidence: {yhat:.4f}")
 if yhat > 0.5:
-    print("The image is classified as: CLASS 1")
+    print("The image is classified as: DOG")
 else:
-    print("The image is classified as: CLASS 0")
+    print("The image is classified as: CAT")

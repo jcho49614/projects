@@ -10,25 +10,25 @@ import numpy as np
 testing = 'data'
 valid_exts = ['jpg', 'jpeg', 'png']
 
-for image_class in os.listdir(testing):
-    classdir = os.path.join(testing, image_class)
-    for image in os.listdir(classdir):
+for image_class in os.listdir(testing): # testing is data folder. list directory of testing and put in image class
+    classdir = os.path.join(testing, image_class) 
+    for image in os.listdir(classdir): #same thing above, but images now. Doesn't actually store the image only the directory.
         imagedir = os.path.join(classdir, image)
         image = cv2.imread(imagedir)
         extension = imghdr.what(imagedir)
-        if extension not in valid_exts:
-            print("Image {} is not valid!", format(imagedir))
-        elif image is None:
-            print("Image {} is not valid!", format(imagedir))
+        if extension not in valid_exts: #originally I used an try/except. Realized that it wasn't needed.
+            print("Image {} is not valid!".format(imagedir))
+        elif image is None: #cv2 returns "None" to unreadable images.
+            print("Image {} is not valid!".format(imagedir))
         else:
             print("Image {} is valid! Using now.".format(imagedir)) 
 
 
-data = tf.keras.utils.image_dataset_from_directory('data') #categorizes into class
-data = data.map(lambda x,y: (x/255, y)) #sizing data
-data_iterator = data.as_numpy_iterator() #easier --> numpy for batches!
+data = tf.keras.utils.image_dataset_from_directory('data') #categorizes into class -- processes it.
+data = data.map(lambda x,y: (x/255, y)) #sizing data and scaling it so it would be smaller
+data_iterator = data.as_numpy_iterator() #puts the data into numpy form and allows us to use "batch".
 
-train_size = int(len(data) * .5)
+train_size = int(len(data) * .5) 
 val_size = int(len(data) * .25) + 1
 test_size = int(len(data) * .25)
 #data size allocation.
